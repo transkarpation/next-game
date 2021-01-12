@@ -6,12 +6,12 @@ const getRandom = (min, max) => {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-export default function Row(props) {
+export default function Row({cells}) {
     return (
         <div className={cn('row')}>
             {
-                Array.from(new Array(props.size)).map((el, index) => {
-                    return <Cell  {...props} cellIndex={index} key={index}></Cell>
+                cells.map((el, index) => {
+                    return <Cell state={el} key={index}></Cell>
                 })
             }
         </div>
