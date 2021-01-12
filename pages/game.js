@@ -1,16 +1,14 @@
-import React from 'react'
-import Cell from '../components/Cell'
-import Row from '../components/Row'
+import React, {useEffect, useState} from 'react'
+import GameTable from '../components/GameTable'
+
+const getRandom = (min, max) => {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 
 export default function Game() {
-    const size = 4;
+    const size = 4
+
     return (
-        <div>
-            {
-                Array.from(Array(size)).map((el, index) => {
-                    return <Row amount={size} key={index} />
-                })
-            }
-        </div>
+        <GameTable size={size} />
     )
 }
