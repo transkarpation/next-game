@@ -7,8 +7,38 @@ const getRandom = (min, max) => {
 
 export default function Game() {
     const size = 10
+    const gameModes = {
+        easyMode: {
+            delay: 2000,
+            field: 5
+        },
+        hardMode: {
+            delay: 900,
+            field: 15
+        },
+        normalMode: {
+            delay: 1000,
+            field: 10
+        }
+    }
+
+    const [currentMode, setCurrentMode] = useState('easyMode')
+
+    const onSelect = (e) => {
+        setCurrentMode(e.target.value)
+    }
 
     return (
-        <GameTable size={size} />
+        <>
+            <select onChange={onSelect}>
+                <option value="easyMode">easyMode</option>
+                <option value="hardMode">hardMode</option>
+                <option value="normalMode">normalMode</option>
+            </select>
+            <div>
+                <GameTable mode={gameModes[currentMode]} />
+            </div>
+        </>
+
     )
 }

@@ -38,27 +38,40 @@ function generate2Dmatrix(size) {
     return matrix
 }
 
-export default function GameTable({ size }) {
-
-    const initFields = generate2Dmatrix(size)
-
-    const availableSpacesInit = () => {
-        const result = []
-        for (let i = 0; i < initFields.length; i++) {
-            for (let j = 0; j < initFields[i].length; j++) {
-                if (initFields[i][j] === 0) {
-                    result.push([i, j])
-                }
+const availableSpacesInit = (fields) => {
+    const result = []
+    for (let i = 0; i < fields.length; i++) {
+        for (let j = 0; j < fields[i].length; j++) {
+            if (fields[i][j] === 0) {
+                result.push([i, j])
             }
         }
-        return result
     }
+    return result
+}
 
-    const [fields, setFields] = useState(initFields)
+export default function GameTable({ mode }) {
+
+    // const initFields = generate2Dmatrix(size)
+    const [fields, setFields] = useState([])
     const [activePosition, setActivePosition] = useState([-1, -1])
-    const [availableSpace, setAvailableSpace] = useState(availableSpacesInit())
-    const [gameCount, setGameCount] = useState({ me: 2, pc: 2 })
+    const [availableSpace, setAvailableSpace] = useState([])
+    const [gameCount, setGameCount] = useState({ me: 0, pc: 0 })
     const [gameRunning, setGameRunning] = useState(false)
+
+    useEffect(() => {
+        if(mode) {
+            console.log(mode)
+            setFields(() => generate2Dmatrix(mode.field))
+        }
+
+    }, [mode])
+
+    useEffect(() => {
+        if(fields.length) {
+            setAvailableSpace(() => availableSpacesInit(fields))
+        }
+    }, [fields])
 
     const emit = (arg) => {
         setAvailableSpace(prev => {
@@ -84,6 +97,7 @@ export default function GameTable({ size }) {
     }
 
     useEffect(() => {
+        const size = mode.field
         const fields = size * size / 2
         if (gameCount.pc > fields) {
             console.log('pc wins')
@@ -101,7 +115,7 @@ export default function GameTable({ size }) {
         let coords = availableSpace[randomIndex]
 
         setActivePosition([coords[0], coords[1]])
-    }, gameRunning ? 1000 : null);
+    }, gameRunning ? mode.delay : null);
 
     return (
         <>
