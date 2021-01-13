@@ -50,14 +50,13 @@ const availableSpacesInit = (fields) => {
     return result
 }
 
-export default function GameTable({ mode }) {
+export default function GameTable({ mode, setStart, setMessage, username }) {
 
     // const initFields = generate2Dmatrix(size)
     const [fields, setFields] = useState([])
     const [activePosition, setActivePosition] = useState([-1, -1])
     const [availableSpace, setAvailableSpace] = useState([])
     const [gameCount, setGameCount] = useState({ me: 0, pc: 0 })
-    const [gameRunning, setGameRunning] = useState(false)
 
     useEffect(() => {
         if(mode) {
@@ -101,12 +100,26 @@ export default function GameTable({ mode }) {
         const fields = size * size / 2
         if (gameCount.pc > fields) {
             console.log('pc wins')
-            setGameRunning(false)
+            setStart(false)
+            setMessage('pc wins')
         }
 
         if (gameCount.me > fields) {
-            console.log('me wins')
-            setGameRunning(false)
+            setStart(false)
+            setMessage(`${username} wins`)
+            fetch('/api/winners', {
+                method: 'POST',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    winner: username,
+                    date: Date.now()
+                }),
+            }).then(() => {
+                console.log('saved')
+            })
         }
     }, [gameCount])
 
@@ -115,7 +128,7 @@ export default function GameTable({ mode }) {
         let coords = availableSpace[randomIndex]
 
         setActivePosition([coords[0], coords[1]])
-    }, gameRunning ? mode.delay : null);
+    }, mode.delay);
 
     return (
         <>
@@ -125,7 +138,6 @@ export default function GameTable({ mode }) {
                 }
             </div>
             <div>
-                <button onClick={() => setGameRunning(true)}>start</button>
                 <p>me: {gameCount.me}</p>
                 <p>pc: {gameCount.pc}</p>
             </div>

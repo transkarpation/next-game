@@ -1,0 +1,19 @@
+.winners {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    .row {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px;
+        background-color: grey;
+        margin-bottom: 2px;
+    }
+
+    .name {
+        margin-right: 20px;
+    }
+}

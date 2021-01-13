@@ -1,65 +1,67 @@
-import Head from 'next/head'
-import styles from '../styles/Home.module.css'
+import React, { useEffect, useState } from 'react'
+import GameTable from '../components/GameTable'
+import Link from 'next/link'
 
-export default function Home() {
-  return (
-    <div className={styles.container}>
-      <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+const getRandom = (min, max) => {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
+const gameModes = {
+    easyMode: {
+        delay: 2000,
+        field: 5
+    },
+    hardMode: {
+        delay: 900,
+        field: 15
+    },
+    normalMode: {
+        delay: 1000,
+        field: 10
+    }
+}
 
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
+export default function Game() {
 
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
+    const [currentMode, setCurrentMode] = useState('easyMode')
+    const [username, setUsername] = useState('')
+    const [start, setStart] = useState(false)
+    const [message, setMessage] = useState('')
 
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
+    const onSelect = (e) => {
+        setCurrentMode(e.target.value)
+    }
 
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
+    return (
+        <div className="game">
+            <div>
+                <Link href="/winners">
+                    <a>Game winners</a>
+                </Link>
+            </div>
+            <div className="game-settings">
+                <select disabled={start} className="game-mode control mr-10" onChange={onSelect}>
+                    <option value="easyMode">easyMode</option>
+                    <option value="hardMode">hardMode</option>
+                    <option value="normalMode">normalMode</option>
+                </select>
+                <input disabled={start} onChange={(e) => setUsername(e.target.value)} value={username} className="control mr-10" type="text" placeholder="Enter your name"></input>
+                <button onClick={() => setStart(true)} disabled={(username.length ? false : true) || start} className="control">
+                    {
+                        message ? 'PLAY AGAIN' : 'PLAY'
+                    }
+                </button>
+            </div>
+            {
+                message ? <p>{message}</p> : null
+            }
+            <div>
+                {
+                    start ? <GameTable setMessage={setMessage} username={username} setStart={setStart} mode={gameModes[currentMode]} /> : null
+                }
 
-          <a
-            href="https://vercel.com/import?filter=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
+            </div>
         </div>
-      </main>
 
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className={styles.logo} />
-        </a>
-      </footer>
-    </div>
-  )
+    )
 }
