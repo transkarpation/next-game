@@ -5,13 +5,42 @@ const getRandom = (min, max) => {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+function useInterval(callback, delay) {
+    const savedCallback = useRef();
+
+    // Remember the latest function.
+    useEffect(() => {
+        savedCallback.current = callback;
+    }, [callback]);
+
+    // Set up the interval.
+    useEffect(() => {
+        function tick() {
+            savedCallback.current();
+        }
+        if (delay !== null) {
+            let id = setInterval(tick, delay);
+            return () => clearInterval(id);
+        }
+    }, [delay]);
+}
+
+function generate2Dmatrix(size) {
+    let matrix = []
+
+    for(let i=0; i<size; i++) {
+        matrix.push([])
+        for(let j=0; j<size; j++) {
+            matrix[i].push(0)
+        }
+    }
+
+    return matrix
+}
+
 export default function GameTable({ size }) {
-    const initFields = [
-        [1, 0, 2, 0],
-        [0, 0, 0, 0],
-        [0, 0, 0, 0],
-        [2, 0, 0, 1]
-    ]
+
+    const initFields = generate2Dmatrix(size)
 
     const availableSpacesInit = () => {
         const result = []
@@ -25,14 +54,11 @@ export default function GameTable({ size }) {
         return result
     }
 
-
-
-
     const [fields, setFields] = useState(initFields)
-    const [activePosition, setActivePosition] = useState([1, 1])
+    const [activePosition, setActivePosition] = useState([-1, -1])
     const [availableSpace, setAvailableSpace] = useState(availableSpacesInit())
     const [gameCount, setGameCount] = useState({ me: 2, pc: 2 })
-    const [gameInterval, setGameInterval] = useState(null)
+    const [gameRunning, setGameRunning] = useState(false)
 
     const emit = (arg) => {
         setAvailableSpace(prev => {
@@ -57,28 +83,16 @@ export default function GameTable({ size }) {
         })
     }
 
-    // useEffect(() => {
-    //     const interval = setInterval(() => {
-    //         let randomIndex = getRandom(0, availableSpace.length - 1)
-    //         let coords = availableSpace[randomIndex]
-
-    //         setActivePosition([coords[0], coords[1]])
-    //     }, 1000)
-
-    //     if (!gameInterval) {
-    //         setGameInterval(interval)
-    //     }
-
-
-    //     return () => clearInterval(interval)
-    // })
-
     useEffect(() => {
         const fields = size * size / 2
         if (gameCount.pc > fields) {
             console.log('pc wins')
-            console.log(gameInterval)
-            clearInterval(gameInterval)
+            setGameRunning(false)
+        }
+
+        if (gameCount.me > fields) {
+            console.log('me wins')
+            setGameRunning(false)
         }
     }, [gameCount])
 
@@ -87,27 +101,7 @@ export default function GameTable({ size }) {
         let coords = availableSpace[randomIndex]
 
         setActivePosition([coords[0], coords[1]])
-    }, 1000);
-
-    function useInterval(callback, delay) {
-        const savedCallback = useRef();
-
-        // Remember the latest function.
-        useEffect(() => {
-            savedCallback.current = callback;
-        }, [callback]);
-
-        // Set up the interval.
-        useEffect(() => {
-            function tick() {
-                savedCallback.current();
-            }
-            if (delay !== null) {
-                let id = setInterval(tick, delay);
-                return () => clearInterval(id);
-            }
-        }, [delay]);
-    }
+    }, gameRunning ? 1000 : null);
 
     return (
         <>
@@ -117,6 +111,7 @@ export default function GameTable({ size }) {
                 }
             </div>
             <div>
+                <button onClick={() => setGameRunning(true)}>start</button>
                 <p>me: {gameCount.me}</p>
                 <p>pc: {gameCount.pc}</p>
             </div>

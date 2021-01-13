@@ -20,13 +20,18 @@ export default function Cell({state, activePosition, row, cell, setFields, emit}
                 setActive(false)
             }
         }
-    })
+    }, [activePosition])
 
     const onClick = () => {
-        if(state !== 3) {
-            return;
+        if (active) {
+            setFields(prev => {
+                let copy = [...prev]
+                copy[row][cell] = 1
+                return copy
+            })
+            emit({coords: [row, cell], win: 'me'})
+            setActive(false)
         }
-        console.log('click action')
     }
 
     return (

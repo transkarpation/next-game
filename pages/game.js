@@ -6,7 +6,7 @@ const getRandom = (min, max) => {
 }
 
 export default function Game() {
-    const size = 4
+    const size = 10
 
     return (
         <GameTable size={size} />
